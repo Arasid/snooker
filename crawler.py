@@ -26,6 +26,9 @@ def parse_dates(text):
         res.append(date)
     return res
 
+def crawl_round(round_title, round_tds):
+    print "crawling Round: %s" % round_title
+
 def crawl_tour(tour_url, title):
     print "crawling Tournament: %s" % title
     f = urllib2.urlopen(tour_url)
@@ -38,7 +41,22 @@ def crawl_tour(tour_url, title):
     x = soup.find("td", text="Location: ")
     location = x.find_next_sibling().text
     c.execute("INSERT INTO tournaments(id, name, location, startdate, enddate) VALUES (NULL, ?, ?, ?, ?)", (title, location, start, end))
+    tour_id = c.lastrowid
     conn.commit()
+
+    tds = soup.select("td.match_round")
+    rounds = []
+    rounds_tds = []
+    for td in tds:
+        title = td.text
+        if len(rounds) == 0 or rounds[-1] != title:
+            rounds.append(title)
+            rounds_tds.append([])
+        rounds_tds[-1].append(td)
+    for i in range(len(rounds)):
+        print rounds[i], i, tour_id
+        c.execute("INSERT INTO rounds(id, name, roundorder, tournament) VALUES (NULL, ?, ?, ?)", (rounds[i], i, tour_id))
+        crawl_round(rounds[i], rounds_tds[i])
 
 def crawl_year(year):
     year_url = 'http://cuetracker.net/Tournaments/%s' % year
@@ -72,7 +90,10 @@ def crawl_year(year):
     for tour, title in tours:
         crawl_tour(tour, title)
 
-for year in years:
-    crawl_year(year)
+#for year in years:
+#    crawl_year(year)
 
+crawl_tour("http://cuetracker.net/Tournaments/World-Championship/2016/2063", "2016 World Championship")
+
+conn.commit()
 conn.close()
