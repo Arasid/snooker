@@ -8,6 +8,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS players (
 c.execute('''CREATE TABLE IF NOT EXISTS tournaments (
                 id integer primary key,
                 name text,
+                location text,
                 startdate integer,
                 enddate integer )''')
 c.execute('''CREATE TABLE IF NOT EXISTS rounds (
