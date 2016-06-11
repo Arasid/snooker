@@ -25,6 +25,8 @@ c.execute('''CREATE TABLE IF NOT EXISTS matches (
                 round integer,
                 player1 integer,
                 player2 integer,
+                bestof integer,
+                walkover integer,
                 FOREIGN KEY(round) REFERENCES rounds(id),
                 FOREIGN KEY(player1) REFERENCES players(id),
                 FOREIGN KEY(player2) REFERENCES players(id) )''')
