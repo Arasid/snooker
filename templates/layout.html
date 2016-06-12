@@ -35,11 +35,15 @@
                     </div><!--/.nav-collapse -->
                 </div><!--/.container-fluid -->
             </nav>
-            {% block content %}{% endblock %}
+            <div class="row">
+                {% block content %}{% endblock %}
+            </div>
             <hr/>
-            <footer>
-                <p>© 2016 <a href="http://getbootstrap.com/">BOOTSTRAP</a> &amp; <a href="./index.html">ME</a></p>
-            </footer>
+            <div class="row">
+                <footer>
+                    <p>© 2016 <a href="http://getbootstrap.com/">BOOTSTRAP</a> &amp; <a href="./index.html">ME</a></p>
+                </footer>
+            </div>
         </div>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}">
