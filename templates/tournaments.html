@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}Tournaments{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block activetours %}
+    class = "active"
+{% endblock %}
+{% block content %}
+    {% for id, name in tours %}
+        <a href="{{ url_for("tournament", id=id) }}">{{ name }}</a></br>
+    {% endfor %}
+{% endblock %}

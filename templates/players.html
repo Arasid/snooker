@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}Players{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block activeplayers %}
+    class = "active"
+{% endblock %}
+{% block content %}
+    {% for id, name in players %}
+        <a href="{{ url_for("player", id=id) }}">{{ name }}</a></br>
+    {% endfor %}
+{% endblock %}
