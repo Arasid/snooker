@@ -2,45 +2,100 @@
 {% block title %}{{ info.name }}{% endblock %}
 {% block head %}
     {{ super() }}
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type="text/javascript">
+        google.charts.load("current", {packages:["calendar"]});
+        google.charts.setOnLoadCallback(drawCalendar);
+
+        function drawCalendar() {
+            // calendar
+            var dataTable = new google.visualization.DataTable();
+            dataTable.addColumn({ type: 'date', id: 'Date' });
+            dataTable.addColumn({ type: 'number', id: 'Won/Loss' });
+            var o = {{ days|safe }};
+            var rows = [];
+            for (var i = 0; i<o.length; ++i) {
+                rows.push([new Date(o[i][0], o[i][1]-1, o[i][2]), o[i][3]]);
+            }
+            dataTable.addRows(rows);
+
+            var chart = new google.visualization.Calendar(document.getElementById('calendar_basic'));
+
+            var options = {
+                title: "{{ info.alias }}",
+                       height: 50+140*{{ n_years }},
+            };
+
+            chart.draw(dataTable, options);
+        }
+    </script>
 {% endblock %}
 {% block content %}
     <h1>{{ info.name }}</h1></br>
-    <b>Country:</b> {{ info.country }} </br>
-    <b>Birth day:</b> {{ info.birth }} </br>
-    <b>Turned professional:</b> {{ info.professional }} </br>
-    <div class="table-responsive">
-        <table class="table table-condensed table-hover">
-            {% for tour in results %}
-                <thead>
-                    <th colspan="6">
-                        <h4> <a href="{{ url_for("tournament", id=tour.id) }}">
-                            {{ tour.name }}
-                        </a></h4>
-                    </th>
-                </thead>
-                <tbody>
-                    {% for round in tour.rounds %}
-                        {% for match in round.matches %}
-                            <tr>
-                                <td class="text-center">{{ round.name }}</td>
-                                <td class="text-center">
-                                    <a href="{{ url_for("player", id=match.id1) }}">
-                                        {{ match.player1 }}
-                                    </a>
-                                </td>
-                                <td class="text-center">{{ match.score1 }}</td>
-                                <td class="text-center">({{ match.bestof }})</td>
-                                <td class="text-center">{{ match.score2 }}</td>
-                                <td class="text-center">
-                                    <a href="{{ url_for("player", id=match.id2) }}">
-                                        {{ match.player2 }}
-                                    </a>
-                                </td>
-                            </tr>
-                        {% endfor %}
+    <ul class="nav nav-pills nav-justified">
+        <li role="presentation"><a data-toggle="pill" href="#info">Info</a></li>
+        <li role="presentation" class="active"><a data-toggle="pill" href="#calendar">Calendar</a></li>
+        <li role="presentation"><a data-toggle="pill" href="#tours">Tournaments</a></li>
+    </ul>
+    <div class="tab-content">
+        <div id="info" class="tab-pane fade">
+            <br/>
+            <div class="table-responsive col-md-6">
+                <table class="table table-condensed">
+                    <tr>
+                        <td>Country:</td>
+                        <td> {{ info.country }}</td>
+                    </tr>
+                    <tr>
+                        <td>Birth day:</td>
+                        <td>{{ info.birth }}</td>
+                    </tr>
+                    <tr>
+                        <td>Turned professional:</td>
+                        <td>{{ info.professional }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div id="calendar" class="tab-pane fade in active">
+            <div id="calendar_basic" style="width: 1000px; height: {{ 50+150*n_years }};"></div>
+        </div>
+        <div id="tours" class="tab-pane fade">
+            <div class="table-responsive">
+                <table class="table table-condensed table-hover">
+                    {% for tour in results %}
+                        <thead>
+                            <th colspan="6">
+                                <h4> <a href="{{ url_for("tournament", id=tour.id) }}">
+                                    {{ tour.name }}
+                                </a></h4>
+                            </th>
+                        </thead>
+                        <tbody>
+                            {% for round in tour.rounds %}
+                                {% for match in round.matches %}
+                                    <tr>
+                                        <td class="text-center">{{ round.name }}</td>
+                                        <td class="text-center">
+                                            <a href="{{ url_for("player", id=match.id1) }}">
+                                                {{ match.player1 }}
+                                            </a>
+                                        </td>
+                                        <td class="text-center">{{ match.score1 }}</td>
+                                        <td class="text-center">({{ match.bestof }})</td>
+                                        <td class="text-center">{{ match.score2 }}</td>
+                                        <td class="text-center">
+                                            <a href="{{ url_for("player", id=match.id2) }}">
+                                                {{ match.player2 }}
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endfor %}
+                        </tbody>
                     {% endfor %}
-                </tbody>
-            {% endfor %}
-        </table>
+                </table>
+            </div>
+        </div>
     </div>
 {% endblock %}

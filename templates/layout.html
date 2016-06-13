@@ -4,6 +4,8 @@
         {% block head %}
             <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap.min.css') }}">
             <title>{% block title %}{% endblock %} - Snooker</title>
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+            <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
         {% endblock %}
     </head>
     <body>
@@ -45,7 +47,5 @@
                 </footer>
             </div>
         </div>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
-        <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}">
     </body>
 </html>
