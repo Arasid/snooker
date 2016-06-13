@@ -41,6 +41,33 @@ def get_days(times):
         res.append([k[0],k[1],k[2],v])
     return res, len(years)
 
+def winned(data):
+    i = 0 if data['id1'] == data['me'] else 1
+    if data['walkover'] > 0:
+        return data['walkover'] == i+1
+    scores = [data['score1'], data['score2']]
+    return scores[i] > scores[1-i]
+
+def get_seasons(seasonal):
+    seasons = {}
+    for data in seasonal:
+        season = data['season']
+        if season not in seasons:
+            seasons[season] = {
+                'winns': 0,
+                'losses': 0
+            }
+
+        if winned(data):
+            seasons[season]['winns'] += 1
+        else:
+            seasons[season]['losses'] += 1
+    results = []
+    for k,v in seasons.items():
+        results.append((k,v['winns'],v['losses']))
+    return sorted(results)
+
+
 @app.route('/tournament/<id>/')
 def tournament(id):
     cur = g.db.cursor()
@@ -95,6 +122,7 @@ def tournaments():
 
 @app.route('/player/<id>/')
 def player(id):
+    id = int(id)
     cur = g.db.cursor()
     cur.execute("SELECT name, country, birthdate, professional FROM players WHERE id=?", (id,))
     player = cur.fetchone()
@@ -108,7 +136,7 @@ def player(id):
         'professional': player[3]
     }
 
-    cur.execute('SELECT m.score1,m.score2,m.player1,m.player2,p1.name,p2.name,m.bestof,m.walkover,m.round, r.name, t.id, t.name,m.date FROM matches as m, players as p1, players as p2, rounds as r, tournaments as t WHERE m.player1 = p1.id AND m.player2 = p2.id AND m.round = r.id AND r.tournament = t.id AND (m.player1 = ? OR m.player2 = ?) ORDER BY t.name DESC;', (id, id))
+    cur.execute('SELECT m.score1,m.score2,m.player1,m.player2,p1.name,p2.name,m.bestof,m.walkover,m.round, r.name, t.id, t.name,m.date,t.season FROM matches as m, players as p1, players as p2, rounds as r, tournaments as t WHERE m.player1 = p1.id AND m.player2 = p2.id AND m.round = r.id AND r.tournament = t.id AND (m.player1 = ? OR m.player2 = ?) ORDER BY t.name DESC;', (id, id))
     matches = cur.fetchall()
     cur.execute("SELECT id,name,roundorder FROM rounds WHERE tournament = ? ORDER BY roundorder ASC;", (id,))
     rounds = cur.fetchall()
@@ -117,7 +145,8 @@ def player(id):
     last_tid = -1
     last_rid = -1
     times = []
-    for score1, score2, id1, id2, player1, player2, bestof, walkover, round, round_name, t_id, t_name, date in matches:
+    seasonal = []
+    for score1, score2, id1, id2, player1, player2, bestof, walkover, round, round_name, t_id, t_name, date, season in matches:
         if t_id != last_tid:
             last_tid = t_id
             results.append({
@@ -143,10 +172,20 @@ def player(id):
             'walkover': walkover
         })
         times.append(date)
+        seasonal.append({
+            'me': id,
+            'id1': id1,
+            'id2': id2,
+            'score1': score1,
+            'score2': score2,
+            'walkover': walkover,
+            'season': season
+        })
 
     days,n_years = get_days(times)
+    seasons = get_seasons(seasonal)
 
-    return render_template('player.html', info=info, results=results, days=days, n_years=n_years)
+    return render_template('player.html', info=info, results=results, days=days, n_years=n_years, seasons=json.dumps(seasons))
 
 @app.route('/player/')
 def players():

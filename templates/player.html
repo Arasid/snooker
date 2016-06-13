@@ -7,13 +7,13 @@
     <h1>{{ info.name }}</h1></br>
     <div class="tabbable">
         <ul class="nav nav-pills nav-justified">
-            <li role="presentation" class="active"><a data-toggle="tab" href="#info">Info</a></li>
+            <li role="presentation"><a data-toggle="tab" href="#info">Info</a></li>
             <li role="presentation"><a id="caltab" data-toggle="tab" href="#calendar">Calendar</a></li>
-            <li role="presentation"><a id="winnlosstab" data-toggle="tab" href="#winnloss">Winn/Loss</a></li>
+            <li role="presentation" class="active"><a id="winnlosstab" data-toggle="tab" href="#winnloss">Winn/Loss</a></li>
             <li role="presentation"><a data-toggle="tab" href="#matches">Matches</a></li>
         </ul>
         <div class="tab-content">
-            <div id="info" class="tab-pane fade in active">
+            <div id="info" class="tab-pane fade">
                 <br/>
                 <div class="table-responsive col-md-6">
                     <table class="table table-condensed">
@@ -35,9 +35,9 @@
             <div id="calendar" class="tab-pane fade">
                 <div id="calendar_basic" style="width: 1000px; height: {{ 50+150*n_years }};"></div>
             </div>
-            <div id="winnloss" class="tab-pane fade">
+            <div id="winnloss" class="tab-pane fade in active">
                 <br/>
-                <div id="bardiv" style="width: 1000px; height: 500px;"></div>
+                <div id="coldiv" style="width: 1000px; height: 500px;"></div>
             </div>
             <div id="matches" class="tab-pane fade">
                 <div class="table-responsive">
@@ -84,7 +84,7 @@
         google.charts.setOnLoadCallback(drawCharts);
 
         function drawCharts() {
-            var activeId = $('.nav-pills li.active a')[0].getAttribute('href');
+            let activeId = $('.nav-pills li.active a')[0].getAttribute('href');
             if (activeId === "#calendar") {
                 drawCalendar();
             } else {
@@ -99,42 +99,39 @@
 
         function drawCalendar() {
             // calendar
-            var dataTable = new google.visualization.DataTable();
+            let dataTable = new google.visualization.DataTable();
             dataTable.addColumn({ type: 'date', id: 'Date' });
             dataTable.addColumn({ type: 'number', id: 'Won/Loss' });
-            var o = {{ days|safe }};
-            var rows = [];
-            for (var i = 0; i<o.length; ++i) {
+            let o = {{ days|safe }};
+            let rows = [];
+            for (let i = 0; i<o.length; ++i) {
                 rows.push([new Date(o[i][0], o[i][1]-1, o[i][2]), o[i][3]]);
             }
             dataTable.addRows(rows);
 
 
-            var options = {
+            let options = {
                 title: "{{ info.alias }}",
                 height: 50+140*{{ n_years }},
             };
-            var chart = new google.visualization.Calendar(document.getElementById('calendar_basic'));
+            let chart = new google.visualization.Calendar(document.getElementById('calendar_basic'));
             chart.draw(dataTable, options);
         }
         function drawWinnLoss() {
-            var data = google.visualization.arrayToDataTable([
-                ['Season', 'Winns', 'Losses'],
-                ['2013-2014', 1000, 400],
-                ['2014-2015', 1000, 400],
-                ['2015-2016', 1170, 460],
-                ['2016-2017', 660, 1120],
-            ]);
+            let rows = {{ seasons|safe }};
+            rows.splice(0,0,['Season', 'Winns', 'Losses']);
+            let dataTable = google.visualization.arrayToDataTable(rows)
 
-            var options = {
-                width: 1000,
+            let options = {
+                width: 900,
                 height: 500,
-                legend: { position: 'top', maxLines: 3 },
-                colors:['green','red']
+                legend: { position: 'top'},
+                colors: ['green','red'],
+                chartArea: {  width: "80%", height: "70%" },
             };
 
-            var chart = new google.charts.Bar(document.getElementById('bardiv'));
-            chart.draw(data, options);
+            let chart = new google.charts.Bar(document.getElementById('coldiv'));
+            chart.draw(dataTable, options);
         }
     </script>
 {% endblock %}
