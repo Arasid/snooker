@@ -8,7 +8,7 @@ import sys
 import create_db
 
 # parameters
-years = [2016, 2015, 2014, 2013, 2012, 2011, 2010, 2009, 2008, 2007]
+years = range(2016, 1996, -1)
 category = 'Ranking'
 category_col_name = 'Category'
 status = 'Professional'
@@ -85,7 +85,7 @@ def crawl_round(round_id, round_tds):
         frames = ''
         if walkover == 0:
             next_row = row.find_next_sibling()
-            if next_row.select_one('td.match_round') is None:
+            if next_row is not None and next_row.select_one('td.match_round') is None:
                 td = next_row.select_one('td')
                 date_text = td.getText('|||', strip=True)
                 if date_text != "":
@@ -110,6 +110,8 @@ def crawl_tour(tour_url, title):
     time.sleep(1)
     html = f.read()
     soup = BeautifulSoup(html, 'html.parser')
+    x = soup.find('td', text='Season: ')
+    season = x.find_next_sibling().text
     x = soup.find('td', text='Dates: ')
     dates = x.find_next_sibling().text
     start, end = parse_dates(dates)
@@ -120,8 +122,8 @@ def crawl_tour(tour_url, title):
         qstart, qend = parse_dates(dates)
     x = soup.find('td', text='Location: ')
     location = x.find_next_sibling().text
-    c.execute('''INSERT INTO tournaments(id, name, location, startdate, enddate, qualstartdate, qualenddate) 
-                VALUES (NULL, ?, ?, ?, ?, ?, ?)''', (title, location, start, end, qstart, qend))
+    c.execute('''INSERT INTO tournaments(id, name, location, season, startdate, enddate, qualstartdate, qualenddate) 
+                VALUES (NULL, ?, ?, ?, ?, ?, ?, ?)''', (title, location, season, start, end, qstart, qend))
     tour_id = c.lastrowid
     conn.commit()
 
@@ -135,7 +137,7 @@ def crawl_tour(tour_url, title):
             rounds_tds.append([])
         rounds_tds[-1].append(td)
     for i in range(len(rounds)):
-        c.execute('INSERT INTO rounds(id, name, roundorder, tournament) VALUES (NULL, ?, ?, ?)', (rounds[i], i, tour_id))
+        c.execute('INSERT INTO rounds(id, name, roundorder, tournament) VALUES (NULL, ?, ?, ?)', (rounds[i], len(rounds)-i-1, tour_id))
         round_id = c.lastrowid
         crawl_round(round_id, rounds_tds[i])
         conn.commit()

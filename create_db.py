@@ -12,6 +12,7 @@ c.execute('''CREATE TABLE IF NOT EXISTS tournaments (
                 id integer primary key,
                 name text,
                 location text,
+                season text,
                 startdate integer,
                 enddate integer,
                 qualstartdate integer,
