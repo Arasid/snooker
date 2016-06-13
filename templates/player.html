@@ -2,10 +2,100 @@
 {% block title %}{{ info.name }}{% endblock %}
 {% block head %}
     {{ super() }}
+{% endblock %}
+{% block content %}
+    <h1>{{ info.name }}</h1></br>
+    <div class="tabbable">
+        <ul class="nav nav-pills nav-justified">
+            <li role="presentation" class="active"><a data-toggle="tab" href="#info">Info</a></li>
+            <li role="presentation"><a id="caltab" data-toggle="tab" href="#calendar">Calendar</a></li>
+            <li role="presentation"><a id="winnlosstab" data-toggle="tab" href="#winnloss">Winn/Loss</a></li>
+            <li role="presentation"><a data-toggle="tab" href="#matches">Matches</a></li>
+        </ul>
+        <div class="tab-content">
+            <div id="info" class="tab-pane fade in active">
+                <br/>
+                <div class="table-responsive col-md-6">
+                    <table class="table table-condensed">
+                        <tr>
+                            <td>Country:</td>
+                            <td> {{ info.country }}</td>
+                        </tr>
+                        <tr>
+                            <td>Birth day:</td>
+                            <td>{{ info.birth }}</td>
+                        </tr>
+                        <tr>
+                            <td>Turned professional:</td>
+                            <td>{{ info.professional }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <div id="calendar" class="tab-pane fade">
+                <div id="calendar_basic" style="width: 1000px; height: {{ 50+150*n_years }};"></div>
+            </div>
+            <div id="winnloss" class="tab-pane fade">
+                <br/>
+                <div id="bardiv" style="width: 1000px; height: 500px;"></div>
+            </div>
+            <div id="matches" class="tab-pane fade">
+                <div class="table-responsive">
+                    <table class="table table-condensed table-hover">
+                        {% for tour in results %}
+                            <thead>
+                                <th colspan="6">
+                                    <h4> <a href="{{ url_for("tournament", id=tour.id) }}">
+                                        {{ tour.name }}
+                                    </a></h4>
+                                </th>
+                            </thead>
+                            <tbody>
+                                {% for round in tour.rounds %}
+                                    {% for match in round.matches %}
+                                        <tr>
+                                            <td class="text-center">{{ round.name }}</td>
+                                            <td class="text-center">
+                                                <a href="{{ url_for("player", id=match.id1) }}">
+                                                    {{ match.player1 }}
+                                                </a>
+                                            </td>
+                                            <td class="text-center">{{ match.score1 }}</td>
+                                            <td class="text-center">({{ match.bestof }})</td>
+                                            <td class="text-center">{{ match.score2 }}</td>
+                                            <td class="text-center">
+                                                <a href="{{ url_for("player", id=match.id2) }}">
+                                                    {{ match.player2 }}
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                {% endfor %}
+                            </tbody>
+                        {% endfor %}
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-        google.charts.load("current", {packages:["calendar"]});
-        google.charts.setOnLoadCallback(drawCalendar);
+        google.charts.load("current", {packages:["calendar", "bar", "geomap"]});
+        google.charts.setOnLoadCallback(drawCharts);
+
+        function drawCharts() {
+            var activeId = $('.nav-pills li.active a')[0].getAttribute('href');
+            if (activeId === "#calendar") {
+                drawCalendar();
+            } else {
+                $("a[href='#calendar']").one('shown.bs.tab', drawCalendar);
+            }
+            if (activeId === "#winnloss") {
+                drawWinnLoss();
+            } else {
+                $("a[href='#winnloss']").one('shown.bs.tab', drawWinnLoss);
+            }
+        }
 
         function drawCalendar() {
             // calendar
@@ -19,83 +109,32 @@
             }
             dataTable.addRows(rows);
 
-            var chart = new google.visualization.Calendar(document.getElementById('calendar_basic'));
 
             var options = {
                 title: "{{ info.alias }}",
-                       height: 50+140*{{ n_years }},
+                height: 50+140*{{ n_years }},
             };
-
+            var chart = new google.visualization.Calendar(document.getElementById('calendar_basic'));
             chart.draw(dataTable, options);
         }
+        function drawWinnLoss() {
+            var data = google.visualization.arrayToDataTable([
+                ['Season', 'Winns', 'Losses'],
+                ['2013-2014', 1000, 400],
+                ['2014-2015', 1000, 400],
+                ['2015-2016', 1170, 460],
+                ['2016-2017', 660, 1120],
+            ]);
+
+            var options = {
+                width: 1000,
+                height: 500,
+                legend: { position: 'top', maxLines: 3 },
+                colors:['green','red']
+            };
+
+            var chart = new google.charts.Bar(document.getElementById('bardiv'));
+            chart.draw(data, options);
+        }
     </script>
-{% endblock %}
-{% block content %}
-    <h1>{{ info.name }}</h1></br>
-    <ul class="nav nav-pills nav-justified">
-        <li role="presentation"><a data-toggle="pill" href="#info">Info</a></li>
-        <li role="presentation" class="active"><a data-toggle="pill" href="#calendar">Calendar</a></li>
-        <li role="presentation"><a data-toggle="pill" href="#tours">Tournaments</a></li>
-    </ul>
-    <div class="tab-content">
-        <div id="info" class="tab-pane fade">
-            <br/>
-            <div class="table-responsive col-md-6">
-                <table class="table table-condensed">
-                    <tr>
-                        <td>Country:</td>
-                        <td> {{ info.country }}</td>
-                    </tr>
-                    <tr>
-                        <td>Birth day:</td>
-                        <td>{{ info.birth }}</td>
-                    </tr>
-                    <tr>
-                        <td>Turned professional:</td>
-                        <td>{{ info.professional }}</td>
-                    </tr>
-                </table>
-            </div>
-        </div>
-        <div id="calendar" class="tab-pane fade in active">
-            <div id="calendar_basic" style="width: 1000px; height: {{ 50+150*n_years }};"></div>
-        </div>
-        <div id="tours" class="tab-pane fade">
-            <div class="table-responsive">
-                <table class="table table-condensed table-hover">
-                    {% for tour in results %}
-                        <thead>
-                            <th colspan="6">
-                                <h4> <a href="{{ url_for("tournament", id=tour.id) }}">
-                                    {{ tour.name }}
-                                </a></h4>
-                            </th>
-                        </thead>
-                        <tbody>
-                            {% for round in tour.rounds %}
-                                {% for match in round.matches %}
-                                    <tr>
-                                        <td class="text-center">{{ round.name }}</td>
-                                        <td class="text-center">
-                                            <a href="{{ url_for("player", id=match.id1) }}">
-                                                {{ match.player1 }}
-                                            </a>
-                                        </td>
-                                        <td class="text-center">{{ match.score1 }}</td>
-                                        <td class="text-center">({{ match.bestof }})</td>
-                                        <td class="text-center">{{ match.score2 }}</td>
-                                        <td class="text-center">
-                                            <a href="{{ url_for("player", id=match.id2) }}">
-                                                {{ match.player2 }}
-                                            </a>
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-                            {% endfor %}
-                        </tbody>
-                    {% endfor %}
-                </table>
-            </div>
-        </div>
-    </div>
 {% endblock %}
