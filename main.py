@@ -83,6 +83,8 @@ def tournament(id):
             'bestof': bestof,
             'walkover': walkover
         })
+    # lebo v DB su rounds naopak
+    results = results[::-1]
 
     return render_template('tournament.html', info=info, results=results)
 
