@@ -151,6 +151,11 @@ def players():
     cur = g.db.cursor()
     return render_template('players.html', players=cur.execute("SELECT id, name FROM players ORDER BY name;"))
 
+@app.route('/map/')
+def map():
+    cur = g.db.cursor()
+    return render_template('map.html', players=cur.execute("SELECT country,COUNT(*) FROM players GROUP BY country;"))
+
 @app.route('/')
 def home():
     return render_template('home.html')

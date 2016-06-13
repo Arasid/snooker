@@ -33,6 +33,9 @@
                             <li {% block activeplayers %}{% endblock %}>
                                 <a href="{{ url_for("players") }}">Players</a>
                             </li>
+                            <li {% block activemap %}{% endblock %}>
+                                <a href="{{ url_for("map") }}">Map</a>
+                            </li>
                         </ul>
                     </div><!--/.nav-collapse -->
                 </div><!--/.container-fluid -->
