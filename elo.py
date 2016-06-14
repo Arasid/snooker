@@ -57,10 +57,14 @@ def season_first_year(season):
 c.execute('SELECT t.id,t.season,t.name FROM tournaments AS t, rounds AS r, matches AS m WHERE r.tournament=t.id AND m.round=r.id AND r.roundorder=(SELECT MAX(roundorder) FROM rounds WHERE tournament = t.id) GROUP BY t.id HAVING COUNT(m.id)==1 ORDER BY t.startdate;')
 tours = [(int(x[0]),season_first_year(x[1]),x[2]) for x in c.fetchall()]
 
+# vypocitam nove rating pre kazdeho do new_rating, a tie zapisem ze ake su po tournamente
+# nerobim to kazdemu, iba tomu co sutazili
+# tympadom na konci len rating updatnem
 for tour,season,name in tours:
     print 'Tournament id: %s' % name
     c.execute('SELECT id FROM rounds WHERE tournament=? ORDER BY roundorder DESC LIMIT 5', (tour,))
     rounds = [int(x[0]) for x in c.fetchall()]
+    new_ratings = {}
     for round in rounds[::-1]:
         c.execute('SELECT player1, player2, score1, score2, walkover FROM matches WHERE round=?', (round,))
         matches = c.fetchall()
@@ -73,8 +77,9 @@ for tour,season,name in tours:
             ks = [k_factor(id, season) for id in players]
             for i in range(2):
                 new_r = rs[i] + ks[i]*(win[i]-es[i])
-                ratings[players[i]] = new_r
-    for id, rating in ratings.items():
+                new_ratings[players[i]] = new_r
+    for id, rating in new_ratings.items():
         c.execute('INSERT INTO elo(id, player, tournament, rating) VALUES (NULL, ?, ?, ?)', (id, tour, rating))
+        ratings[id] = rating
     conn.commit()
 conn.close()
