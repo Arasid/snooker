@@ -4,6 +4,9 @@
         <a href="{{ url_for("player", id=match.id1) }}">
             {{ match.player1 }}
         </a>
+        {% if match.walkover == 1 %}
+            (Walkover)
+        {% endif %}
     </td>
     <td class="text-center">{{ match.score1 }}</td>
     <td class="text-center">({{ match.bestof }})</td>
@@ -12,5 +15,8 @@
         <a href="{{ url_for("player", id=match.id2) }}">
             {{ match.player2 }}
         </a>
+        {% if match.walkover == 2 %}
+            (Walkover)
+        {% endif %}
     </td>
 </tr>

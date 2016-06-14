@@ -22,6 +22,11 @@ def teardown_request(exception):
 def stamp2text(time):
     return datetime.datetime.fromtimestamp(int(time)).strftime('%d.%m.%Y')
 
+def stampNull2text(time):
+    if time == 'NULL':
+        return ''
+    return stamp2text(time)
+
 def get_days(times):
     days = {}
     years = set()
@@ -82,8 +87,8 @@ def tournament(id):
         'season': tour[2],
         'startdate': stamp2text(tour[3]),
         'enddate': stamp2text(tour[4]),
-        'qualstartdate': '' if tour[5] == 'NULL' else stamp2text(tour[5]),
-        'qualenddate': '' if tour[6] == 'NULL' else stamp2text(tour[6]),
+        'qualstartdate': stampNull2text(tour[5]),
+        'qualenddate': stampNull2text(tour[6]),
     }
 
     cur.execute('SELECT m.score1,m.score2,m.player1,m.player2,p1.name,p2.name,m.bestof,m.walkover,m.round FROM matches as m, players as p1, players as p2 WHERE m.round IN (SELECT id FROM rounds WHERE tournament = ?) AND m.player1 = p1.id AND m.player2 = p2.id ORDER BY round;', (id,))
