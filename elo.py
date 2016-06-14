@@ -78,8 +78,8 @@ for tour,season,name in tours:
             for i in range(2):
                 new_r = rs[i] + ks[i]*(win[i]-es[i])
                 new_ratings[players[i]] = new_r
+                ratings[players[i]] = new_r
     for id, rating in new_ratings.items():
         c.execute('INSERT INTO elo(id, player, tournament, rating) VALUES (NULL, ?, ?, ?)', (id, tour, rating))
-        ratings[id] = rating
     conn.commit()
 conn.close()

@@ -19,7 +19,7 @@ def get_player(text):
     g = re.match(r'Winner of Match (\d+)', text)
     if g is None:
         return text
-    return g.group(1)
+    return int(g.group(1))
 
 matches = []
 def crawl_tour(tour_url, title):
@@ -43,7 +43,7 @@ def crawl_tour(tour_url, title):
             player1 = get_player(tds[1].getText(strip=True))
             player2 = get_player(tds[3].getText(strip=True))
             matches.append({
-                'id': tds[0].getText(strip=True),
+                'id': int(tds[0].getText(strip=True)),
                 'player1': player1,
                 'player2': player2
             })
