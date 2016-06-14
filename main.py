@@ -195,7 +195,8 @@ def players():
 @app.route('/map/')
 def map():
     cur = g.db.cursor()
-    return render_template('map.html', players=cur.execute("SELECT country,COUNT(*) FROM players GROUP BY country;"))
+    cur.execute("SELECT country,COUNT(*) FROM players GROUP BY country;")
+    return render_template('map.html', players=json.dumps(cur.fetchall()))
 
 @app.route('/')
 def home():

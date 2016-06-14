@@ -9,12 +9,12 @@
 {% block content %}
     <h1>Map</h1></br>
     <div id='chart'></div>
-    <div id="chart_div" style="width: 900px; height: 500px;"></div>
+    <div id='chart_div' style='width: 900px; height: 500px;'></div>
     <div id='map_canvas'></div>
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <script type='text/javascript' src='https://www.gstatic.com/charts/loader.js'></script>
     <script type='text/javascript' src='http://www.google.com/jsapi'></script>
-    <script type="text/javascript">
-        google.charts.load("visualization", '1', {packages:["geochart"]});
+    <script type='text/javascript'>
+        google.charts.load('visualization', '1', {packages:['geochart']});
         google.charts.setOnLoadCallback(draw);
 
         function draw() {
@@ -22,61 +22,22 @@
         }
 
         function drawMarkersMap() {
-            var data = google.visualization.arrayToDataTable([
-                ['Country', 'Players'],
-                ['Afghanistan', 1],
-                ['Australia',   10],
-                ['Bahrain', 2],
-                ['Belgium', 8],
-                ['Brazil',  2],
-                ['Bulgaria',    2],
-                ['Canada',  2],
-                ['China',   49],
-                ['Cyprus',  1],
-                ['Egypt',   2],
-                ['England', 178],
-                ['Finland', 1],
-                ['Germany', 6],
-                ['Hong Kong',   3],
-                ['India',   13],
-                ['Iran',    2],
-                ['Ireland', 16],
-                ['Isle of Man', 1],
-                ['Latvia',  1],
-                ['Libya',   1],
-                ['Malaysia',    1],
-                ['Malta',   4],
-                ['Netherlands', 2],
-                ['New Zealand', 2],
-                ['Northern Ireland',    10],
-                ['Norway',  2],
-                ['Oman',    1],
-                ['Pakistan',    3],
-                ['Poland',  4],
-                ['Qatar',   1],
-                ['Saudi Arabia',    1],
-                ['Scotland',    27],
-                ['Singapore',   1],
-                ['Switzerland', 1],
-                ['Syria',   1],
-                ['Thailand',    13],
-                ['Turkey',  1],
-                ['United Arab Emirates',    2],
-                ['Wales',   27],
-            ]);
+            let rows = {{ players|safe }};
+            rows.splice(0,0,['Country', 'Players']);
+            let data = google.visualization.arrayToDataTable(rows);
 
-            var options = {
-                region: "world",
+            let options = {
+                region: 'world',
                 displayMode: 'markers',
                 colorAxis: {colors: ['green', 'blue']},
             };
 
-            var chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
+            let chart = new google.visualization.GeoChart(document.getElementById('chart_div'));
             chart.draw(data, options);
 
             google.visualization.events.addListener(chart, 'select', function() {    
-                var selectionIdx = chart.getSelection()[0].row;
-                var countryName = data.getValue(selectionIdx, 0);   
+                let selectionIdx = chart.getSelection()[0].row;
+                let countryName = data.getValue(selectionIdx, 0);   
                 console.log(countryName);
                 //options.region = countryName;
                 //chart.draw(data, options);
