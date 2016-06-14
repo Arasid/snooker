@@ -71,23 +71,23 @@ def get_seasons(seasonal):
 @app.route('/tournament/<id>/')
 def tournament(id):
     cur = g.db.cursor()
-    cur.execute("SELECT name,location,startdate,enddate,qualstartdate,qualenddate FROM tournaments WHERE id=?", (id,))
+    cur.execute('SELECT name,location,startdate,enddate,qualstartdate,qualenddate FROM tournaments WHERE id=?', (id,))
     tour = cur.fetchone()
     if tour is None:
-        return render_template('error.html', msg=("Tournament " + id + " doesn't exists."))
+        return render_template('error.html', msg=('Tournament ' + id + " doesn't exists."))
     info  = {
         'id': id,
         'name': tour[0],
         'location': tour[1],
         'startdate': stamp2text(tour[2]),
         'enddate': stamp2text(tour[3]),
-        'qualstartdate': "" if tour[4] == 'NULL' else stamp2text(tour[4]),
-        'qualenddate': "" if tour[5] == 'NULL' else stamp2text(tour[5]),
+        'qualstartdate': '' if tour[4] == 'NULL' else stamp2text(tour[4]),
+        'qualenddate': '' if tour[5] == 'NULL' else stamp2text(tour[5]),
     }
 
-    cur.execute("SELECT m.score1,m.score2,m.player1,m.player2,p1.name,p2.name,m.bestof,m.walkover,m.round FROM matches as m, players as p1, players as p2 WHERE m.round IN (SELECT id FROM rounds WHERE tournament = ?) AND m.player1 = p1.id AND m.player2 = p2.id ORDER BY round;", (id,))
+    cur.execute('SELECT m.score1,m.score2,m.player1,m.player2,p1.name,p2.name,m.bestof,m.walkover,m.round FROM matches as m, players as p1, players as p2 WHERE m.round IN (SELECT id FROM rounds WHERE tournament = ?) AND m.player1 = p1.id AND m.player2 = p2.id ORDER BY round;', (id,))
     matches = cur.fetchall()
-    cur.execute("SELECT id, name,roundorder FROM rounds WHERE tournament = ? ORDER BY roundorder ASC;", (id,))
+    cur.execute('SELECT id, name,roundorder FROM rounds WHERE tournament = ? ORDER BY roundorder ASC;', (id,))
     rounds = cur.fetchall()
 
     results = []
@@ -118,16 +118,16 @@ def tournament(id):
 @app.route('/tournament/')
 def tournaments():
     cur = g.db.cursor()
-    return render_template('tournaments.html', tours=cur.execute("SELECT id, name FROM tournaments ORDER BY name DESC;"))
+    return render_template('tournaments.html', tours=cur.execute('SELECT id, name FROM tournaments ORDER BY name DESC;'))
 
 @app.route('/player/<id>/')
 def player(id):
     id = int(id)
     cur = g.db.cursor()
-    cur.execute("SELECT name, country, birthdate, professional FROM players WHERE id=?", (id,))
+    cur.execute('SELECT name, country, birthdate, professional FROM players WHERE id=?', (id,))
     player = cur.fetchone()
     if player is None:
-        return render_template('error.html', msg=("Player " + id + " doesn't exists."))
+        return render_template('error.html', msg=('Player ' + id + " doesn't exists."))
     info  = {
         'id': id,
         'name': player[0],
@@ -138,7 +138,7 @@ def player(id):
 
     cur.execute('SELECT m.score1,m.score2,m.player1,m.player2,p1.name,p2.name,m.bestof,m.walkover,m.round, r.name, t.id, t.name,m.date,t.season FROM matches as m, players as p1, players as p2, rounds as r, tournaments as t WHERE m.player1 = p1.id AND m.player2 = p2.id AND m.round = r.id AND r.tournament = t.id AND (m.player1 = ? OR m.player2 = ?) ORDER BY t.name DESC;', (id, id))
     matches = cur.fetchall()
-    cur.execute("SELECT id,name,roundorder FROM rounds WHERE tournament = ? ORDER BY roundorder ASC;", (id,))
+    cur.execute('SELECT id,name,roundorder FROM rounds WHERE tournament = ? ORDER BY roundorder ASC;', (id,))
     rounds = cur.fetchall()
 
     results = []
@@ -190,12 +190,12 @@ def player(id):
 @app.route('/player/')
 def players():
     cur = g.db.cursor()
-    return render_template('players.html', players=cur.execute("SELECT id, name FROM players ORDER BY name;"))
+    return render_template('players.html', players=cur.execute('SELECT id, name FROM players ORDER BY name;'))
 
 @app.route('/map/')
 def map():
     cur = g.db.cursor()
-    cur.execute("SELECT country,COUNT(*) FROM players GROUP BY country;")
+    cur.execute('SELECT country,COUNT(*) FROM players GROUP BY country;')
     return render_template('map.html', players=json.dumps(cur.fetchall()))
 
 @app.route('/')
