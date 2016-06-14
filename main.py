@@ -124,7 +124,7 @@ def tournament(id):
 @app.route('/tournament/')
 def tournaments():
     cur = g.db.cursor()
-    return render_template('tournaments.html', tours=cur.execute('SELECT id, name FROM tournaments ORDER BY name DESC;'))
+    return render_template('tournaments.html', tours=cur.execute('SELECT id, name FROM tournaments ORDER BY startdate DESC;'))
 
 @app.route('/player/<id>/')
 def player(id):

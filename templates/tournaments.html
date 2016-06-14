@@ -7,7 +7,9 @@
     class = "active"
 {% endblock %}
 {% block content %}
-    {% for id, name in tours %}
-        <a href="{{ url_for("tournament", id=id) }}">{{ name }}</a></br>
-    {% endfor %}
+    <ul>
+        {% for id, name in tours %}
+            <li><a href="{{ url_for("tournament", id=id) }}">{{ name }}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}

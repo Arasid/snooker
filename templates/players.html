@@ -7,7 +7,9 @@
     class = "active"
 {% endblock %}
 {% block content %}
-    {% for id, name in players %}
-        <a href="{{ url_for("player", id=id) }}">{{ name }}</a></br>
-    {% endfor %}
+    <ul>
+        {% for id, name in players %}
+            <li><a href="{{ url_for("player", id=id) }}">{{ name }}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}
