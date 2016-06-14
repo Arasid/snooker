@@ -191,7 +191,18 @@ def player(id):
     days,n_years = get_days(times)
     seasons = get_seasons(seasonal)
 
-    return render_template('player.html', info=info, results=results, days=days, n_years=n_years, seasons=json.dumps(seasons))
+    cur.execute('SELECT t.startdate,t.name,e.rating FROM elo AS e, tournaments AS t WHERE e.tournament=t.id AND player=? ORDER BY t.startdate;', (id,))
+    elos = []
+    for time, name, rating in cur.fetchall():
+        dat = datetime.datetime.fromtimestamp(int(time))
+        day = (dat.year, dat.month, dat.day)
+        elos.append({
+            'name': name,
+            'rating': rating,
+            'date': day
+        })
+
+    return render_template('player.html', info=info, results=results, days=days, n_years=n_years, seasons=json.dumps(seasons), elos=json.dumps(elos))
 
 @app.route('/player/')
 def players():

@@ -7,13 +7,14 @@
     <h1>{{ info.name }}</h1></br>
     <div class="tabbable">
         <ul class="nav nav-pills nav-justified">
-            <li role="presentation"><a data-toggle="tab" href="#info">Info</a></li>
+            <li role="presentation" class="active"><a data-toggle="tab" href="#info">Info</a></li>
             <li role="presentation"><a id="caltab" data-toggle="tab" href="#calendar">Calendar</a></li>
-            <li role="presentation" class="active"><a id="winnlosstab" data-toggle="tab" href="#winnloss">Winn/Loss</a></li>
+            <li role="presentation"><a id="winnlosstab" data-toggle="tab" href="#winnloss">Winn/Loss</a></li>
+            <li role="presentation"><a data-toggle="tab" href="#elo">Elo rating</a></li>
             <li role="presentation"><a data-toggle="tab" href="#matches">Matches</a></li>
         </ul>
         <div class="tab-content">
-            <div id="info" class="tab-pane fade">
+            <div id="info" class="tab-pane fade in active">
                 <br/>
                 <div class="table-responsive col-md-6">
                     <table class="table table-condensed">
@@ -33,11 +34,15 @@
                 </div>
             </div>
             <div id="calendar" class="tab-pane fade">
-                <div id="calendar_basic" style="width: 1000px; height: {{ 50+150*n_years }};"></div>
+                <div id="calendar_basic" style="width: 1100px; height: {{ 50+150*n_years }};"></div>
             </div>
-            <div id="winnloss" class="tab-pane fade in active">
+            <div id="winnloss" class="tab-pane fade">
                 <br/>
-                <div id="coldiv" style="width: 1000px; height: 500px;"></div>
+                <div id="coldiv" style="width: 1100px; height: 500px;"></div>
+            </div>
+            <div id="elo" class="tab-pane fade">
+                <br/>
+                <div id="linechart_material" style="width: 1100px; height: 500px;"></div>
             </div>
             <div id="matches" class="tab-pane fade">
                 <div class="table-responsive">
@@ -65,7 +70,7 @@
     </div>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script type="text/javascript">
-        google.charts.load("current", {packages:["calendar", "bar"]});
+        google.charts.load("current", {packages:["calendar", "bar", "line", "corechart"]});
         google.charts.setOnLoadCallback(drawCharts);
 
         function drawCharts() {
@@ -79,6 +84,11 @@
                 drawWinnLoss();
             } else {
                 $("a[href='#winnloss']").one('shown.bs.tab', drawWinnLoss);
+            }
+            if (activeId === "#elo") {
+                drawElo();
+            } else {
+                $("a[href='#elo']").one('shown.bs.tab', drawElo);
             }
         }
 
@@ -108,7 +118,7 @@
             let dataTable = google.visualization.arrayToDataTable(rows)
 
             let options = {
-                width: 900,
+                width: 1100,
                 height: 500,
                 legend: { position: 'top'},
                 colors: ['green','red'],
@@ -116,6 +126,28 @@
             };
 
             let chart = new google.charts.Bar(document.getElementById('coldiv'));
+            chart.draw(dataTable, google.charts.Bar.convertOptions(options));
+        }
+        function drawElo() {
+            let o = {{ elos|safe }};
+            let rows = [];
+            rows.push([{id: "Date", type: 'date'}, {id: "Rating", type: 'number', label:'Rating'}, {type: 'string', role: 'tooltip'}]);
+            for (let i = 0; i<o.length; ++i) {
+                let date = o[i].date;
+                rows.push([new Date(date[0], date[1]-1, date[2]), o[i].rating, o[i].name+"\nRating: "+o[i].rating.toFixed(2)]);
+            }
+            let dataTable = google.visualization.arrayToDataTable(rows)
+
+            let options = {
+                width: 1100,
+                height: 500,
+                chartArea:{left:60,top:20,width:'90%',height:'75%'},
+                legend: 'none',
+                vAxis: {format: 'decimal',title:'Rating'},
+                hAxis: {format: 'yyyy', title: 'Year'}
+            };
+            let chart = new google.visualization.LineChart(document.getElementById('linechart_material'));
+
             chart.draw(dataTable, options);
         }
     </script>
