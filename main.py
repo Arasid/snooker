@@ -46,6 +46,56 @@ def get_days(times):
         res.append([k[0],k[1],k[2],v])
     return res, len(years)
 
+def is_number(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
+def predict_base_on_elo(matches):
+    cur = g.db.cursor()
+    ms = {}
+    for m in matches:
+        ms[m['id']] = {
+            'player1': m['player1'],
+            'player2': m['player2']
+        }
+    results = []
+    for id, m in sorted(ms.items()):
+        p1 = m['player1']
+        p2 = m['player2']
+        if is_number(p1):
+            p1 = ms[p1]['winner']
+        if is_number(p2):
+            p2 = ms[p2]['winner']
+        # ak nebudem mat to meno v db, tak dam ze ma rating 200
+        rating1, rating2 = 200, 200 
+        cur.execute('SELECT e.rating, MAX(t.startdate) FROM elo AS e, tournaments AS t, players AS p WHERE e.player=p.id AND e.tournament=t.id AND p.name=?;', (p1,))
+        r1 = cur.fetchone()
+        if r1 is not None:
+            rating1 = r1[0]
+        cur.execute('SELECT e.rating, MAX(t.startdate) FROM elo AS e, tournaments AS t, players AS p WHERE e.player=p.id AND e.tournament=t.id AND p.name=?;', (p2,))
+        r2 = cur.fetchone()
+        if r2 is not None:
+            rating2 = r2[0]
+
+        win = 0
+        if rating1 >= rating2:
+            ms[id]['winner'] = p1
+            win = 1
+        else:
+            ms[id]['winner'] = p2
+            win = 2
+        results.append({
+            'player1': p1,
+            'player2': p2,
+            'id': id,
+            'winner': win
+        })
+
+    return results
+
 def winned(data):
     i = 0 if data['id1'] == data['me'] else 1
     if data['walkover'] > 0:
@@ -207,7 +257,28 @@ def player(id):
 @app.route('/player/')
 def players():
     cur = g.db.cursor()
-    return render_template('players.html', players=cur.execute('SELECT id, name FROM players ORDER BY name;'))
+    cur.execute('SELECT id, name FROM players ORDER BY name;')
+    players=cur.fetchall()
+    return render_template('players.html', players=players)
+
+@app.route('/predict/')
+def predicts():
+    cur = g.db.cursor()
+    cur.execute('SELECT t.id, t.name FROM tournaments AS t, predict as p WHERE t.id = p.tournament ORDER BY t.startdate;')
+    tours = cur.fetchall()
+    return render_template('predicts.html', tournaments=tours)
+
+@app.route('/predict/<id>/')
+def predict(id):
+    cur = g.db.cursor()
+    cur.execute('SELECT t.name, p.matches FROM tournaments AS t, predict as p WHERE t.id = p.tournament AND t.id=?;',(id,))
+    name, matches = cur.fetchone()
+    matches = json.loads(matches)
+    matches = sorted(matches, key=lambda m: int(m['id']))
+
+    pred_matches = predict_base_on_elo(matches)
+
+    return render_template('predict.html', name=name, matches=matches, id=id, pred_matches=pred_matches)
 
 @app.route('/map/')
 def map():

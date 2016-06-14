@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+{% block title %}Predict - {{ name }}{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block content %}
+    <h1> <a href="{{ url_for("tournament",id=id) }}">{{ name }}</a></h1>
+    <br/>
+    <div class="tabbable">
+        <ul class="nav nav-pills nav-justified">
+            <li role="presentation" class="active"><a data-toggle="tab" href="#plan">Planned matches</a></li>
+            <li role="presentation"><a data-toggle="tab" href="#pred">Predictions</a></li>
+        </ul>
+        <div class="tab-content">
+            <br/>
+            <div id="plan" class="tab-pane fade in active">
+                <div class="table-responsive">
+                    <table class="table table-condensed table-hover">
+                        <thead>
+                            <th class="text-center">#</th>
+                            <th class="text-center">Player 1</th>
+                            <th class="text-center"></th>
+                            <th class="text-center">Player 2</th>
+                        </thead>
+                        <tbody>
+                            {% for match in matches %}
+                                <tr id="row{{match.id}}">
+                                    <td class="text-center">{{ match.id }}</td>
+                                    {% if match.player1 is number %}
+                                        <td class="text-center"><a href="#row{{match.player1}}">Winner of {{ match.player1 }}</a></td>
+                                    {% else %}
+                                        <td class="text-center">{{ match.player1 }}</td>
+                                    {% endif %}
+                                    <td class="text-center">vs</td>
+                                    {% if match.player2 is number %}
+                                        <td class="text-center"><a href="#row{{match.player2}}">Winner of {{ match.player2 }}</a></td>
+                                    {% else %}
+                                        <td class="text-center">{{ match.player2 }}</td>
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div id="pred" class="tab-pane fade">
+                <div class="table-responsive">
+                    <table class="table table-condensed table-hover">
+                        <thead>
+                            <th class="text-center">#</th>
+                            <th class="text-center">Player 1</th>
+                            <th class="text-center"></th>
+                            <th class="text-center">Player 2</th>
+                        </thead>
+                        <tbody>
+                            {% for match in pred_matches %}
+                                <tr id="row{{match.id}}">
+                                    <td class="text-center">{{ match.id }}</td>
+                                    <td class="text-center">
+                                        {% if match.winner == 1 %} <b> {% endif %}
+                                            {{ match.player1 }}
+                                        {% if match.winner == 1 %} </b> {% endif %}
+                                    </td>
+                                    <td class="text-center">vs</td>
+                                    <td class="text-center">
+                                        {% if match.winner == 2 %} <b> {% endif %}
+                                            {{ match.player2 }}
+                                        {% if match.winner == 2 %} </b> {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

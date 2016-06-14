@@ -36,18 +36,25 @@
                             <li {% block activemap %}{% endblock %}>
                                 <a href="{{ url_for("map") }}">Map</a>
                             </li>
+                            <li {% block activepredicts %}{% endblock %}>
+                                <a href="{{ url_for("predicts") }}">Predicts</a>
+                            </li>
                         </ul>
                     </div><!--/.nav-collapse -->
                 </div><!--/.container-fluid -->
             </nav>
             <div class="row">
-                {% block content %}{% endblock %}
+                <div class="container">
+                    {% block content %}{% endblock %}
+                </div>
             </div>
             <hr/>
             <div class="row">
-                <footer>
-                    <p>© 2016 <a href="http://getbootstrap.com/">BOOTSTRAP</a> &amp; <a href="./index.html">ME</a></p>
-                </footer>
+                <div class="container">
+                    <footer>
+                        <p>© 2016 <a href="http://getbootstrap.com/">BOOTSTRAP</a> &amp; <a href="./index.html">ME</a></p>
+                    </footer>
+                </div>
             </div>
         </div>
     </body>

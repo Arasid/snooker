@@ -1,0 +1,15 @@
+{% extends "layout.html" %}
+{% block title %}Predicts{% endblock %}
+{% block head %}
+    {{ super() }}
+{% endblock %}
+{% block activepredicts %}
+    class = "active"
+{% endblock %}
+{% block content %}
+    <ul>
+        {% for id, name in tournaments %}
+            <li><a href="{{ url_for("predict", id=id) }}">{{ name }}</a></li>
+        {% endfor %}
+    </ul>
+{% endblock %}
