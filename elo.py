@@ -68,7 +68,7 @@ for tour,season,name in tours:
             win = winned(score1, score2, walkover)
             players = [player1, player2]
             rs = [get_rating(id, season) for id in players]
-            qs = [10**(r/400) for r in rs]
+            qs = [10**(r/400.0) for r in rs]
             es = [q/sum(qs) for q in qs]
             ks = [k_factor(id, season) for id in players]
             for i in range(2):
