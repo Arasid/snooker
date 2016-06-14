@@ -1,0 +1,16 @@
+<tr>
+    <td class="text-center">{{ round.name }}</td>
+    <td class="text-center">
+        <a href="{{ url_for("player", id=match.id1) }}">
+            {{ match.player1 }}
+        </a>
+    </td>
+    <td class="text-center">{{ match.score1 }}</td>
+    <td class="text-center">({{ match.bestof }})</td>
+    <td class="text-center">{{ match.score2 }}</td>
+    <td class="text-center">
+        <a href="{{ url_for("player", id=match.id2) }}">
+            {{ match.player2 }}
+        </a>
+    </td>
+</tr>

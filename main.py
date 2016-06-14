@@ -71,7 +71,7 @@ def get_seasons(seasonal):
 @app.route('/tournament/<id>/')
 def tournament(id):
     cur = g.db.cursor()
-    cur.execute('SELECT name,location,startdate,enddate,qualstartdate,qualenddate FROM tournaments WHERE id=?', (id,))
+    cur.execute('SELECT name,location,season,startdate,enddate,qualstartdate,qualenddate FROM tournaments WHERE id=?', (id,))
     tour = cur.fetchone()
     if tour is None:
         return render_template('error.html', msg=('Tournament ' + id + " doesn't exists."))
@@ -79,10 +79,11 @@ def tournament(id):
         'id': id,
         'name': tour[0],
         'location': tour[1],
-        'startdate': stamp2text(tour[2]),
-        'enddate': stamp2text(tour[3]),
-        'qualstartdate': '' if tour[4] == 'NULL' else stamp2text(tour[4]),
-        'qualenddate': '' if tour[5] == 'NULL' else stamp2text(tour[5]),
+        'season': tour[2],
+        'startdate': stamp2text(tour[3]),
+        'enddate': stamp2text(tour[4]),
+        'qualstartdate': '' if tour[5] == 'NULL' else stamp2text(tour[5]),
+        'qualenddate': '' if tour[6] == 'NULL' else stamp2text(tour[6]),
     }
 
     cur.execute('SELECT m.score1,m.score2,m.player1,m.player2,p1.name,p2.name,m.bestof,m.walkover,m.round FROM matches as m, players as p1, players as p2 WHERE m.round IN (SELECT id FROM rounds WHERE tournament = ?) AND m.player1 = p1.id AND m.player2 = p2.id ORDER BY round;', (id,))
