@@ -125,11 +125,12 @@ def get_seasons(seasonal):
 
 @app.route('/tournament/<id>/')
 def tournament(id):
+    id = int(id)
     cur = g.db.cursor()
     cur.execute('SELECT name,location,season,startdate,enddate,qualstartdate,qualenddate FROM tournaments WHERE id=?', (id,))
     tour = cur.fetchone()
     if tour is None:
-        return render_template('error.html', msg=('Tournament ' + id + " doesn't exists."))
+        return render_template('error.html', msg=("Tournament %d doesn't exists." % id))
     info  = {
         'id': id,
         'name': tour[0],
@@ -183,7 +184,7 @@ def player(id):
     cur.execute('SELECT name, country, birthdate, professional FROM players WHERE id=?', (id,))
     player = cur.fetchone()
     if player is None:
-        return render_template('error.html', msg=('Player ' + id + " doesn't exists."))
+        return render_template('error.html', msg=("Player %d doesn't exists." % id))
     info  = {
         'id': id,
         'name': player[0],
@@ -270,9 +271,13 @@ def predicts():
 
 @app.route('/predict/<id>/')
 def predict(id):
+    id = int(id)
     cur = g.db.cursor()
     cur.execute('SELECT t.name, p.matches FROM tournaments AS t, predict as p WHERE t.id = p.tournament AND t.id=?;',(id,))
-    name, matches = cur.fetchone()
+    result = cur.fetchone()
+    if result is None:
+        return render_template('error.html', msg=("Predict for tournament %d doesn't exists." % id))
+    name, matches = result
     matches = json.loads(matches)
     matches = sorted(matches, key=lambda m: int(m['id']))
 
