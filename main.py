@@ -73,11 +73,11 @@ def predict_base_on_elo(matches):
         rating1, rating2 = 200, 200 
         cur.execute('SELECT e.rating, MAX(t.startdate) FROM elo AS e, tournaments AS t, players AS p WHERE e.player=p.id AND e.tournament=t.id AND p.name=?;', (p1,))
         r1 = cur.fetchone()
-        if r1 is not None:
+        if r1[0] is not None:
             rating1 = r1[0]
         cur.execute('SELECT e.rating, MAX(t.startdate) FROM elo AS e, tournaments AS t, players AS p WHERE e.player=p.id AND e.tournament=t.id AND p.name=?;', (p2,))
         r2 = cur.fetchone()
-        if r2 is not None:
+        if r2[0] is not None:
             rating2 = r2[0]
 
         win = 0
@@ -87,11 +87,16 @@ def predict_base_on_elo(matches):
         else:
             ms[id]['winner'] = p2
             win = 2
+        q1 = 10**(rating1/400.0)
+        q2 = 10**(rating2/400.0)
+        e1, e2 = q1/(q1+q2), q2/(q1+q2)
         results.append({
             'player1': p1,
             'player2': p2,
             'id': id,
-            'winner': win
+            'winner': win,
+            'pr1': e1,
+            'pr2': e2
         })
 
     return results
