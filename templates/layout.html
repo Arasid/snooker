@@ -2,6 +2,7 @@
 <html>
     <head>
         {% block head %}
+            <link rel="icon" href="{{ url_for('static',filename='images/ball.ico') }}">
             <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css"></script>
             <title>{% block title %}{% endblock %} - Snooker</title>
             <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
@@ -52,7 +53,21 @@
             <div class="row">
                 <div class="container">
                     <footer>
-                        <p>© 2016 <a href="http://getbootstrap.com/">BOOTSTRAP</a> &amp; <a href="./index.html">ME</a></p>
+                        <p>
+                            <div class='pull-left'>
+                                © 2016 <a href="http://getbootstrap.com/">BOOTSTRAP</a> &amp; <a href="./index.html">Barbora Klembarova</a>
+                            </div>
+                            <div class='pull-right'>
+                                <img src="{{ url_for('static',filename='images/red.png') }}"  width="30" height="30">
+                                <img src="{{ url_for('static',filename='images/yellow.png') }}"  width="30" height="30">
+                                <img src="{{ url_for('static',filename='images/green.png') }}"  width="30" height="30">
+                                <img src="{{ url_for('static',filename='images/brown.png') }}"  width="30" height="30">
+                                <img src="{{ url_for('static',filename='images/blue.png') }}"  width="30" height="30">
+                                <img src="{{ url_for('static',filename='images/pink.png') }}"  width="30" height="30">
+                                <img src="{{ url_for('static',filename='images/black.png') }}"  width="30" height="30">
+                                <img src="{{ url_for('static',filename='images/white.png') }}"  width="30" height="30">
+                            </div>
+                        </p>
                     </footer>
                 </div>
             </div>
