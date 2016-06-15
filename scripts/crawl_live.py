@@ -21,8 +21,8 @@ def get_player(text):
         return text
     return int(g.group(1))
 
-matches = []
 def crawl_tour(tour_url, title):
+    matches = []
     print 'crawling Tournament: %s' % title
     c.execute('SELECT id from tournaments WHERE name=?;', (title,))
     id = int(c.fetchone()[0])
